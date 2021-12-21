@@ -17,7 +17,8 @@ Class ChecksVariable
             static::mailhog(),
             static::https(),
             static::sitemap(),
-            static::robots()
+            static::robots(),
+            static::seoPlugin()
         ];
     }
 
@@ -107,6 +108,11 @@ Class ChecksVariable
         {
             return new Check('Robots', false, 'URL not accessible');
         }
+    }
+    
+    public static function seoPlugin()
+    {
+        return new Check('SEO Plugin', Craft::$app->getPlugins()->getPlugin('seo'));
     }
     
 }

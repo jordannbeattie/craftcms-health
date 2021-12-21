@@ -117,17 +117,27 @@ Class ChecksVariable
     
     public static function robots()
     {
-        $url = App::url() . '/robots.txt';
-        try
+        $sitemap = App::robotsHasSitemap();
+        $blocksAll = App::robotsBlocksAll();
+        
+        if( !$sitemap )
         {
-            $content = file_get_contents($url);
-            
-            return new Check('Robots', true);
+            return new Check('Robots', false, 'Sitemap missing from robots.txt');
         }
-        catch( \Exception $e )
+        
+        if( App::env('production') )
         {
-            return new Check('Robots', false, 'URL not accessible');
+            return !$blocksAll
+                ? new Check('Robots', true)
+                : new Check('Robots', false, 'Robots blocked on production');
         }
+        else
+        {
+            return $blocksAll
+                ? new Check('Robots', true)
+                : new Check('Robots', false, 'Robots should be blocked outside of production');
+        }
+        
     }
     
     public static function seoPlugin()

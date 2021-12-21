@@ -2,6 +2,7 @@
 
 namespace jordanbeattie\CraftCmsHealth\variables;
 use Craft;
+use jordanbeattie\CraftCmsHealth\checks\EnvCheck;
 use jordanbeattie\CraftCmsHealth\models\Check;
 use jordanbeattie\CraftCmsHealth\controllers\AppController as App;
 use craft\helpers\App as CraftApp;
@@ -84,26 +85,34 @@ Class ChecksVariable
     
     public static function sitemap()
     {
-        if( static::seoPlugin()->failed() )
+        $urlOk = false;
+        try
         {
-            try
+            $client = new \GuzzleHttp\Client();
+            $res = $client->get(App::url('/sitemap.xml'));
+            if( $res->getStatusCode() == "200" )
             {
-                file_get_contents(App::url('/sitemap.xml') . '/sitemap.xml');
-                return new Check('Sitemap', true);
-            }
-            catch( \Exception $e )
-            {
-                return new Check('Sitemap', false, 'URL not accessible');
+                $urlOk = true;
             }
         }
-        
+        catch( \GuzzleHttp\Exception\BadResponseException $e ){}
         $query = new Query();
         $query = $query->from('seo_sitemap')->where(['enabled' => '1'])->count();
-        if( $query > 0 )
+        $enabled = $query > 0;
+    
+        if( $enabled && $urlOk )
         {
             return new Check('Sitemap', true);
         }
-        return new Check('Sitemap', false, 'No sections enabled');
+        elseif( !$urlOk )
+        {
+            return new Check('Sitemap', false, 'URL is not accessible');
+        }
+        elseif( !$enabled )
+        {
+            return new Check('Sitemap', false, '0 sections enabled');
+        }
+        
     }
     
     public static function robots()

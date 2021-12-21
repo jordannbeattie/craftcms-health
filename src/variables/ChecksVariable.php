@@ -112,7 +112,8 @@ Class ChecksVariable
     
     public static function seoPlugin()
     {
-        return new Check('SEO Plugin', Craft::$app->getPlugins()->getPlugin('seo'));
+        $plugin = Craft::$app->getPlugins()->getPlugin('seo');
+        return new Check('SEO Plugin', ( $plugin ? true : false ));
     }
     
 }

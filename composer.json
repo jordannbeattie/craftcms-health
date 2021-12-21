@@ -1,0 +1,32 @@
+{
+    "name": "jordanbeattie/craftcms-health",
+    "description": "Health checks for your craftcms site",
+    "type": "craft-plugin",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin"
+    ],
+    "support": {},
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Jordan Beattie",
+            "homepage": "https://jordanbeattie.com"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "jordanbeattie\\CraftCmsHealth\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Health",
+        "handle": "health",
+        "class": "jordanbeattie\\CraftCmsHealth\\CraftCmsHealth"
+    }
+}

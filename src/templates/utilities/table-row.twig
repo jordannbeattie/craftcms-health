@@ -1,0 +1,7 @@
+{% if check is defined %}
+	<tr>
+		<th class="light">{{ check.getTitle() }}</th>
+		<td>{% if check.isApplicable() %}{% include check.getIconPath() %}{% endif %}</td>
+		<td>{{ check.getText() }}</td>
+	</tr>
+{% endif %}

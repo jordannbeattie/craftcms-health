@@ -1,0 +1,12 @@
+<h1>Health</h1>
+<table class="data fullwidth fixed-layout">
+	<tbody>
+		{% for check in checks %}
+
+			{% include 'health/utilities/table-row' with {
+				check: check
+			} %}
+
+		{% endfor %}
+	</tbody>
+</table>

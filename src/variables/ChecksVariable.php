@@ -5,6 +5,7 @@ use Craft;
 use jordanbeattie\CraftCmsHealth\models\Check;
 use jordanbeattie\CraftCmsHealth\controllers\AppController as App;
 use craft\helpers\App as CraftApp;
+use craft\db\Query;
 
 Class ChecksVariable
 {
@@ -83,16 +84,26 @@ Class ChecksVariable
     
     public static function sitemap()
     {
-        $url = App::url() . '/sitemap.xml';
-        try
+        if( static::seoPlugin()->failed() )
         {
-            file_get_contents($url);
+            try
+            {
+                file_get_contents(App::url('/sitemap.xml') . '/sitemap.xml');
+                return new Check('Sitemap', true);
+            }
+            catch( \Exception $e )
+            {
+                return new Check('Sitemap', false, 'URL not accessible');
+            }
+        }
+        
+        $query = new Query();
+        $query = $query->from('seo_sitemap')->where(['enabled' => '1'])->count();
+        if( $query > 0 )
+        {
             return new Check('Sitemap', true);
         }
-        catch( \Exception $e )
-        {
-            return new Check('Sitemap', false, 'URL not accessible');
-        }
+        return new Check('Sitemap', false, 'No sections enabled');
     }
     
     public static function robots()

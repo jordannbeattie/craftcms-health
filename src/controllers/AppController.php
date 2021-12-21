@@ -11,9 +11,9 @@ class AppController extends \craft\web\Controller
         return getenv('ENVIRONMENT') == "dev";
     }
     
-    public static function url()
+    public static function url( $url = null )
     {
-        return Craft::$app->getSites()->getPrimarySite()->getBaseUrl();
+        return Craft::$app->getSites()->getPrimarySite()->getBaseUrl() . $url;
     }
     
     public static function usesHttps()

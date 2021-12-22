@@ -2,13 +2,17 @@
 
 namespace jordanbeattie\CraftCmsHealth;
 use craft\events\RegisterComponentTypesEvent;
+use craft\services\ProjectConfig;
 use craft\services\Utilities;
 use \craft\web\View;
 use \craft\events\RegisterTemplateRootsEvent;
 use \craft\web\twig\variables\CraftVariable;
+use jordanbeattie\CraftCmsHealth\console\controllers\CheckController;
+use jordanbeattie\CraftCmsHealth\controllers\CommandController;
 use jordanbeattie\CraftCmsHealth\utilities\Health;
 use jordanbeattie\CraftCmsHealth\variables\ChecksVariable;
 use yii\base\Event;
+use yii\db\Command;
 
 class CraftCmsHealth extends \craft\base\Plugin
 {
@@ -37,6 +41,13 @@ class CraftCmsHealth extends \craft\base\Plugin
             function (Event $event) {
                 $variable = $event->sender;
                 $variable->set('checks', ChecksVariable::class);
+            }
+        );
+        Event::on(
+            ProjectConfig::class,
+            ProjectConfig::EVENT_AFTER_APPLY_CHANGES,
+            function (Event $event) {
+                CommandController::execute(true, false);
             }
         );
     }

@@ -14,17 +14,33 @@ class CheckController extends \craft\console\Controller
 {
     
     public $notify = false;
+    public $output = true;
     
     public function options($actionID)
     {
-        return ['notify'];
+        return ['notify', 'output'];
+    }
+    
+    public function optionAliases()
+    {
+        return [
+          'notify' => 'notify',
+          'no-output' => 'noOutput'
+        ];
     }
     
     public function actionIndex()
     {
-        echo "\n";
-        echo CommandController::execute($this->notify);
-        echo "\n";
+        if( $this->notify )
+        {
+            echo "\n";
+            echo CommandController::execute($this->notify, $this->output);
+            echo "\n";
+        }
+        else
+        {
+            echo CommandController::execute($this->notify, $this->output);
+        }
     }
     
 }

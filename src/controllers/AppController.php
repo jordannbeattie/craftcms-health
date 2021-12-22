@@ -2,9 +2,16 @@
 namespace jordanbeattie\CraftCmsHealth\controllers;
 use \craft\console\Request;
 use Craft;
+use jordanbeattie\CraftCmsHealth\CraftCmsHealth;
 
 class AppController extends \craft\web\Controller
 {
+    
+    public static function siteNameAndUrl()
+    {
+        $site = Craft::$app->getSites()->getPrimarySite();
+        return $site->getName() . " (" . $site->getBaseUrl() . ")";
+    }
     
     public static function env( $env = null )
     {
@@ -85,6 +92,23 @@ class AppController extends \craft\web\Controller
     {
         $parsed = static::parseRobots(static::url('/robots.txt'));
         return array_key_exists( 'Sitemap', $parsed );
+    }
+    
+    public static function slackMessage()
+    {
+        $webhook = CraftCmsHealth::getInstance()->getSettings()->getSlackWebhook();
+        $slack = new \Slack($webhook);
+        $slack->setDefaultUsername('CraftCMS Health Check');
+        $slack->setDefaultChannel('#jbtesting');
+        $slack->setDefaultEmoji(":stethoscope:");
+        return new \SlackMessage($slack);
+    }
+    
+    public static function slackAvailable()
+    {
+        return CraftCmsHealth::getInstance()->getSettings()->getSlackWebhook()
+            ? true
+            : false;
     }
     
 }

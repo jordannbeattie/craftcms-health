@@ -12,6 +12,8 @@ use yii\base\Event;
 
 class CraftCmsHealth extends \craft\base\Plugin
 {
+    public $hasCpSettings = true;
+    
     public function init()
     {
         parent::init();
@@ -38,4 +40,15 @@ class CraftCmsHealth extends \craft\base\Plugin
             }
         );
     }
+    
+    protected function createSettingsModel(){
+        return new \jordanbeattie\CraftCmsHealth\models\Settings();
+    }
+    
+    protected function settingsHtml(){
+        return \Craft::$app->getView()->renderTemplate('health/settings/page', [
+            'settings' => $this->getSettings()
+        ]);
+    }
+    
 }

@@ -53,22 +53,30 @@ Class ChecksVariable
     {
         $settings = CraftApp::mailSettings()->transportSettings;
         $mailhogInUse = $settings['host'] == "0.0.0.0" && $settings['port'] == "1025" && $settings['encryptionMethod'] == "none";
+        
         if( static::smtp()->failed() )
         {
-            return new Check('Mailhog', false, 'SMTP is not in use');
+            $check = new Check('Mailhog', false, 'SMTP is not in use');
+            $check->setNotApplicable();
+            return $check;
         }
+        
         if( App::isLocal() && $mailhogInUse )
         {
             return new Check('Mailhog', true );
+        }
+        elseif( App::isLocal() && !$mailhogInUse )
+        {
+            return new Check('Mailhog', false);
         }
         elseif( !App::isLocal() && $mailhogInUse )
         {
             return new Check('Mailhog', false, 'Mailhog should only be used in dev');
         }
-        elseif( !App::isLocal() )
+        elseif( !App::isLocal() && !$mailhogInUse )
         {
-            $check = new Check('Mailhog', false);
-            $check->isApplicable();
+            $check = new Check('Mailhog', true);
+            $check->setNotApplicable();
             return $check;
         }
     }

@@ -1,0 +1,9 @@
+{% import '_includes/forms' as forms %}
+
+{{ forms.autosuggestField({
+	label: 'Slack Webhook',
+	name: 'slackWebhook',
+	value: settings['slackWebhook'],
+	autofocus: true,
+	suggestEnvVars: true
+}) }}

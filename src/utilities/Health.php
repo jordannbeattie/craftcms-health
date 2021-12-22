@@ -42,7 +42,7 @@ class Health extends Utility
      */
     public static function iconPath()
     {
-        return '';
+        return __DIR__ .'/icon.svg';
     }
     
     /**

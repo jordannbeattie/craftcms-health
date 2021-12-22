@@ -51,8 +51,6 @@ Class ChecksVariable
     
     public static function mailhog()
     {
-        $settings = CraftApp::mailSettings()->transportSettings;
-        $mailhogInUse = $settings['host'] == "0.0.0.0" && $settings['port'] == "1025" && $settings['encryptionMethod'] == "none";
         
         if( static::smtp()->failed() )
         {
@@ -60,6 +58,9 @@ Class ChecksVariable
             $check->setNotApplicable();
             return $check;
         }
+    
+        $settings = CraftApp::mailSettings()->transportSettings;
+        $mailhogInUse = $settings['host'] == "0.0.0.0" && $settings['port'] == "1025" && $settings['encryptionMethod'] == "none";
         
         if( App::isLocal() && $mailhogInUse )
         {
@@ -104,23 +105,38 @@ Class ChecksVariable
             }
         }
         catch( \GuzzleHttp\Exception\BadResponseException $e ){}
-        $query = new Query();
-        $query = $query->from('seo_sitemap')->where(['enabled' => '1'])->count();
-        $enabled = $query > 0;
+        
+        if( static::seoPlugin()->passed() )
+        {
+            $query = new Query();
+            
+            try{
+                $query = $query->from('seo_sitemap')->where(['enabled' => '1'])->count();
+                $enabled = $query > 0;
+            }
+            catch( \Exception $e )
+            {
+                return new check('Sitemap', false);
+            }
     
-        if( $enabled && $urlOk )
+            if( $enabled && $urlOk )
+            {
+                return new Check('Sitemap', true);
+            }
+            elseif( !$urlOk )
+            {
+                return new Check('Sitemap', false, 'URL is not accessible');
+            }
+            elseif( !$enabled )
+            {
+                return new Check('Sitemap', false, '0 sections enabled');
+            }
+        }
+        elseif( $urlOk )
         {
             return new Check('Sitemap', true);
         }
-        elseif( !$urlOk )
-        {
-            return new Check('Sitemap', false, 'URL is not accessible');
-        }
-        elseif( !$enabled )
-        {
-            return new Check('Sitemap', false, '0 sections enabled');
-        }
-        
+        return new Check('Sitemap', false);
     }
     
     public static function robots()

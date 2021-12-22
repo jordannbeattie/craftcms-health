@@ -109,14 +109,15 @@ Class ChecksVariable
         if( static::seoPlugin()->passed() )
         {
             $query = new Query();
+            $table = env('DB_TABLE_PREFIX') . 'seo_sitemap';
             
             try{
-                $query = $query->from('seo_sitemap')->where(['enabled' => '1'])->count();
+                $query = $query->from($table)->where(['enabled' => '1'])->count();
                 $enabled = $query > 0;
             }
             catch( \Exception $e )
             {
-                return new check('Sitemap', false);
+                return new check('Sitemap', false, "could not read table " . $table);
             }
     
             if( $enabled && $urlOk )

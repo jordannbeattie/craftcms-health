@@ -96,10 +96,10 @@ class AppController extends \craft\web\Controller
     
     public static function slackMessage()
     {
-        $webhook = CraftCmsHealth::getInstance()->getSettings()->getSlackWebhook();
-        $slack = new \Slack($webhook);
+        $settings = CraftCmsHealth::getInstance()->getSettings();
+        $slack = new \Slack($settings->getSlackWebhook());
         $slack->setDefaultUsername('CraftCMS Health Check');
-        $slack->setDefaultChannel('#jbtesting');
+        $slack->setDefaultChannel($settings->getSlackChannel());
         $slack->setDefaultEmoji(":stethoscope:");
         return new \SlackMessage($slack);
     }

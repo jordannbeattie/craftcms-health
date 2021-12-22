@@ -7,3 +7,11 @@
 	autofocus: true,
 	suggestEnvVars: true
 }) }}
+
+{{ forms.autosuggestField({
+	label: 'Slack Channel',
+	name: 'slackChannel',
+	value: settings['slackChannel'],
+	placeholder: "#general",
+	suggestEnvVars: true
+}) }}

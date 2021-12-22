@@ -2,6 +2,7 @@
 
 namespace jordanbeattie\CraftCmsHealth\variables;
 use Craft;
+use GuzzleHttp\Client;
 use jordanbeattie\CraftCmsHealth\checks\EnvCheck;
 use jordanbeattie\CraftCmsHealth\models\Check;
 use jordanbeattie\CraftCmsHealth\controllers\AppController as App;
@@ -84,27 +85,33 @@ Class ChecksVariable
     
     public static function https()
     {
-        $check = new Check('HTTPS', App::usesHttps());
+        $check = new Check('HTTPS', false);
+        $check->setPassed(App::usesHttps() && App::canConnect() );
+        
         if( App::isLocal() )
         {
             $check->setNotApplicable();
         }
+        
         return $check;
     }
     
     public static function sitemap()
     {
+        $url = App::formatUrl(App::url('/sitemap.xml'));
         $urlOk = false;
         try
         {
             $client = new \GuzzleHttp\Client();
-            $res = $client->get(App::url('/sitemap.xml'));
+            $res = $client->get($url);
             if( $res->getStatusCode() == "200" )
             {
                 $urlOk = true;
             }
         }
-        catch( \GuzzleHttp\Exception\BadResponseException $e ){}
+        catch( \Exception $e ){
+            return new Check('Sitemap', false, $e->getMessage());
+        }
         
         if( static::seoPlugin()->passed() )
         {
@@ -137,7 +144,7 @@ Class ChecksVariable
         {
             return new Check('Sitemap', true);
         }
-        return new Check('Sitemap', false);
+        return new Check('Sitemap', false, 'no idea');
     }
     
     public static function robots()

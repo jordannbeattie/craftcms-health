@@ -51,4 +51,9 @@ class Check extends \craft\base\Model
         return $this->applicable;
     }
     
+    public function setPassed( $passed )
+    {
+        $this->passed = $passed;
+    }
+    
 }

@@ -1,84 +1,54 @@
-# Image Optimization
-Render images in your Craft templates with a single include. Pass in classes, fallbacks, transforms and more and have optimized images on your site compliant with Google Page Speed Insights. 
+# CraftCMS Health
+See simple checks for the health of your CraftCMS site and get notifications if they fail!
 
 ## Installation
-Include the package in your project: 
 ```
-composer require jordanbeattie/craftcms-images
-```
-and install the plugin within the CMS. 
-
-## Usage
-Instead of writing out `<img>` tags in your project, pass variables to the render function which will optimize the image for you. 
-
-| Variable | Description | 
-| --- | --- |
-| Field | The CraftCMS field where users can upload a single image.|
-| Transform | The handle of an image transform to use. _*See transforms._ |
-| Fallback | A static URL/path to an image that can be used if there is an issue rendering the image or if the field is empty. |
-| Class | Any classes that should be added to the tag |
-| Style | Any items to be included in the `style` attributes |
-| Alt | Text for the alt attribute. If none is supplied and the field variable is passed, the alt text from the image model will be used. |
-| Attributes | Any other attributes to be added to the tag. This should be an array. _* See attributes._ |
-
-### Transforms
-Including transforms is the best way to serve images. You can pass the transform handle through to the include. 
-The plugin will look for the transform with the handle provided and also a mobile version which should have the same handle appended with "Mobile". 
-e.g. _myTransformHandle_ and _myTransformHandleMobile_.
-
-### Attributes
-Often, when using third-party packages such as MatchHeight, you will need to add custom attributes. These can be passed in as an array. 
-```
-attributes: {
-    'data-mh': 'my-image'
-}
+composer require jordanbeattie/craftcms-health
+./craft plugin/install health
+./craft plugin/enable health
 ```
 
-## Examples
-#### Full parameters
-```
-{{ craft.images.render(block.image, {
-    transform: 'blockTransform', 
-    fallback: 'https://example.com/fallback-image.png', 
-    class: 'w-full h-full hidden md:block', 
-    style: 'display:none',
-    attributes: {
-        'data-mh': 'my-block-image'
-    }
-}) }}
+## Checks
+The current checks are currently setup. If you have a request for another check, get in touch. 
+
+### Environment
+Checks that the `ENVIRONMENT` variable has been set and is equal to either _dev_, _staging_ or _production_.
+
+### SMTP
+Checks that SMTP is being used to send email.
+
+### Mailhog
+Checks that Mailhog is in use in _dev_ and not in any other environment. 
+
+### HTTPS
+Checks that HTTPS is being used in the Site URL. Will be marked as not-applicable on _dev_.
+
+### Sitemap
+Checks that your-site-url/sitemap.xml is readable. 
+If ether/seo is also installed, it will check that at least 1 section is enabled to be listed in the sitemap. 
+
+### Robots
+Checks that our-site-url/robots.txt is readable and ensures that robots are not blocked on _production_ but are blocked in other environments.
+
+### SEO Plugin
+Checks that ether/seo is installed.
+
+## Results
+You can view the checks in the utilities section at our-site-url/admin/utilities/health or by running the command
+``` 
+./craft health/check 
 ```
 
-#### Image without transform
-```
-{{ craft.images.render(block.image) }}
-```
+Results have 3 parts: Title of the check, status (pass/fail) and text which will display any relevant comments. Often explaining why the check has failed.
 
-#### Static image
+## Notifications
+All notifications are sent via Slack. You can add your [Slack webhook](https://slack.com/intl/en-gb/help/articles/115005265063-Incoming-webhooks-for-Slack) and channel in the settings section.
+To receive notifications of failed checks, add the `--notify` option to the above command. 
 ```
-{{ craft.images.render({
-    fallback: 'https://example.com/fallback-image.png'
-) }}
+./craft health/check --notify
 ```
+This will send a Slack notification for failed checks only. 
 
-#### Replacing an existing img tag
-```
-<img alt="" class="block max-w-full p-0 m-0 rounded-lg pointer-events-none select-none" src="{{ tab.image.one().url }}" />
-```
-should be replaced with
-```
-{{ craft.images.render(tab.image, {
-    class: "block max-w-full p-0 m-0 rounded-lg pointer-events-none select-none"
-) }}
-```
-or with a transform
-```
-{{ craft.images.render( tab.image, {
-    transform: 'tabBlockImage',
-    class: "block max-w-full p-0 m-0 rounded-lg pointer-events-none select-none"
-} }}
-```
-
-## Contact
-Jordan Beattie <br>
-jordan@jordanbeattie.com <br>
-www.jordanbeattie.com
+### Why don't you send notifications via email?
+Part of the checks is to ensure that email delivery is successful. If there was an issue sending emails from the site, notifications would also not be sent.
+In a future update, we look to add more notification options. 
